@@ -1,13 +1,10 @@
 (ql:quickload :lispbuilder-sdl)
 (ql:quickload :cl-opengl)
 (ql:quickload :cl-glu)
-(ql:quickload :cl-glut)
 
 ;;window frame size
 (defconstant +window-width+ 640)
 (defconstant +window-height+ 480)
-
-(defun draw-face ())
 
 (defun main ()
   (sdl:with-init ()
@@ -43,7 +40,8 @@
 
     ;;set camera position
     (gl:translate 0 0 -5)
-    (glu:look-at 3.0 4.0 5.0 0.0 0.0 0.0 0.0 1.0 0.0)
+    ;;look-at
+    (glu:look-at 3.0 4.0 5.0 0.0 0.0 0.0 1.0 0.0 0.0)
     
     (sdl:with-events ()
       (:quit-event () t)
@@ -89,7 +87,6 @@
 	     (gl:with-primitives :lines
 	       (gl:vertex 0 1 1)
 	       (gl:vertex 1 1 1))
-	     (gl:with-primitives :)
 	     (sdl:update-display)))))
 
 (main)

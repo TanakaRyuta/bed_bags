@@ -1,12 +1,13 @@
 (ql:quickload :lispbuilder-sdl)
 (ql:quickload :cl-opengl)
 (ql:quickload :cl-glu)
+;;(ql:quickload :cl-glut)
 
 ;;load file
 (load "key.lisp" :external-format :utf-8)
 (load "loader.lisp" :external-format :utf-8)
 (load "stage.lisp" :external-format :utf-8)
-(load "status.lisp" :external-format :utf-8)
+;;(load "status.lisp" :external-format :utf-8)
 (load "objects.lisp" :external-format :utf-8)
 
 ;;window frame size

@@ -1,4 +1,4 @@
-### ./souce内のファイル
+### ./source内のファイル
 - キューブワールード：CuveWorld.lisp
 - 画像の読み込み：loader.lisp
 - プレイヤー：player.lisp
@@ -7,7 +7,7 @@
 - オブジェクト：objects.lisp  
 - ステージ：stage.lisp
 ### プログラムの起動方法
-- emacの起動
-- ミニバッファ内にAlt+xとshellと入力して、sbclを起動
-- ファイルを立ち上げて、コンパイルさせたい箇所を指定して、Ctrl+xを二回押して、
+- emacsの起動
+- ミニバッファ内にAlt+x:sbclと入力して、replを起動
+- 実行したいファイルを立ち上げて、コンパイルさせたい箇所を指定して、Ctrl+xを二回押して、
 - (main)で実行

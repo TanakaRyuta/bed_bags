@@ -37,6 +37,41 @@
   (setf (camera-diry camera) y)
   (setf (camera-dirz camera) z))
 
+(defun camera-move (current-key camera)
+  (with-slots (right left up down) current-key
+    (and left (progn
+		(setf (camera-posx camera) (+ (camera-posx camera) 0.1))
+		(setf (camera-posy camera) (+ (camera-posy camera) -0.1))
+		(setf (camera-posz camera) (+ (camera-posz camera) 0))
+		(gl:translate 0.1 -0.1 0)))
+    (and right (progn
+		 (setf (camera-posx camera) (+ (camera-posx camera) -0.1))
+		 (setf (camera-posy camera) (+ (camera-posy camera) 0.1))
+		 (setf (camera-posz camera) (+ (camera-posz camera) 0))
+		 (gl:translate -0.1 0.1 0)))
+    (and down (progn
+		(setf (camera-posx camera) (+ (camera-posx camera) 0.1))
+		(setf (camera-posy camera) (+ (camera-posy camera) 0.1))
+		(setf (camera-posz camera) (+ (camera-posz camera) 0))
+		(gl:translate 0.1 0.1 0)))
+    (and up (progn
+	      (setf (camera-posx camera) (+ (camera-posx camera) -0.1))
+	      (setf (camera-posy camera) (+ (camera-posy camera) -0.1))
+	      (setf (camera-posz camera) (+ (camera-posz camera) 0))
+	      (gl:translate -0.1 -0.1 0)))))
+
+(defun camera-angle (current-key camera)
+  (with-slots (sright sleft sup sdown) current-key
+    (and sright (progn
+		  (gl:push-matrix)
+		  (gl:translate (camera-posx camera)
+				(camera-posy camera)
+				(camera-posz camera))
+		  (gl:rotate -10 0 0 1)
+		  (gl:pop-matrix)))
+    (and sleft (gl:rotate 10 0 0 1))
+    (and sup (gl:rotate -10 1 1 0))
+    (and sdown (gl:rotate 10 1 1 0))))
 
 ;;entry point
 (defun main ()
@@ -111,6 +146,9 @@
 	(:idle ()
 	       (gl:clear :color-buffer-bit :depth-buffer-bit)
 	       (gl:color 1 1 1)
+
+	       (camera-move current-key cam)
+	       (camera-angle current-key cam)
 	       
 	       (dotimes (n 15)
 		 (dotimes (i 15)
@@ -140,21 +178,23 @@
 		 (gl:vertex 0 0 -100)
 		 (gl:vertex 0 0 100))
 	       
+	       
 	       (test-input-key current-key)
 
-	       (gl:push-matrix)
-	       (glu:ortho-2d 0.0 +window-width+ 0.0 +window-height+)
-	       (gl:matrix-mode :modelview)
-	       (gl:push-matrix)
-	       (gl:load-identity)
-	       (gl:color 1 0 1)
-	       (gl:with-primitives :quads
-		 (gl:vertex 0 0 0) (gl:vertex 10 0 0)
-		 (gl:vertex 10 10 0) (gl:vertex 0 10 0))
-	       (gl:matrix-mode :modelview)
-	       (gl:pop-matrix)
-	       (gl:matrix-mode :projection)
-	       (gl:pop-matrix)
+	       ;;(gl:push-matrix)
+	       ;;(glu:ortho-2d 0.0 +window-width+ 0.0 +window-height+)
+	       ;;(gl:matrix-mode :modelview)
+	       ;;(gl:push-matrix)
+	       ;;(gl:load-identity)
+	       ;;(gl:color 1 0 1)
+	       ;;(gl:with-primitives :quads
+	       ;;(gl:vertex 0 0 0) (gl:vertex 10 0 0)
+	       ;;(gl:vertex 10 10 0) (gl:vertex 0 10 0))
+	       ;;(gl:matrix-mode :modelview)
+	       ;;(gl:pop-matrix)
+	       ;;(gl:matrix-mode :projection)
+	       ;;(gl:pop-matrix)
+	       
 	       (sdl:update-display)
 	       (setf frame-timer (+ 1 frame-timer)))))))
 

@@ -35,76 +35,15 @@
 (defun camera-dir (camera x y z)
   (setf (camera-dirx camera) x)
   (setf (camera-diry camera) y)
-  (setf (camera-dirz camera) z)
-  )
+  (setf (camera-dirz camera) z))
 
-;;
-(defun frame-cube (x y z r)  
-  (+ *object-num* 1)
-  (gl:with-primitives :lines
-    (gl:vertex x y z)
-    (gl:vertex (+ x r) y z))
-  (gl:with-primitives :lines
-    (gl:vertex x y z)
-    (gl:vertex x (+ y r) z))
-  (gl:with-primitives :lines
-    (gl:vertex x y z)
-    (gl:vertex x y (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex (+ x r) y z)
-    (gl:vertex (+ x r) (+ y r) z))
-  (gl:with-primitives :lines
-    (gl:vertex (+ x r) y z)
-    (gl:vertex (+ x r) y (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex x (+ y r) z)
-    (gl:vertex (+ x r) (+ y r) z))
-  (gl:with-primitives :lines
-    (gl:vertex x (+ y r) z)
-    (gl:vertex x (+ y r) (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex x y (+ z r))
-    (gl:vertex (+ x r) y (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex x y (+ z r))
-    (gl:vertex x (+ y r) (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex (+ x r) (+ y r) z)
-    (gl:vertex (+ x r) (+ y r) (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex (+ x r) y (+ z r))
-    (gl:vertex (+ x r) (+ y r) (+ z r)))
-  (gl:with-primitives :lines
-    (gl:vertex x (+ y r) (+ z r))
-    (gl:vertex (+ x r) (+ y r) (+ z r))))
-
-(defun face-cube (x y z r)
-  (+ *object-num* 1)
-  (gl:with-primitives :quads
-    (gl:vertex x (+ y r) z) (gl:vertex (+ x r) (+ y r) z)
-    (gl:vertex (+ x r) y z) (gl:vertex x y z))
-  (gl:with-primitives :quads
-    (gl:vertex x y z) (gl:vertex (+ x r) y z)
-    (gl:vertex (+ x r) y (+ z r)) (gl:vertex x y (+ z r)))
-  (gl:with-primitives :quads
-    (gl:vertex x y z) (gl:vertex x y (+ z r))
-    (gl:vertex x (+ y r) (+ z r)) (gl:vertex x (+ y r) z))
-  (gl:with-primitives :quads
-    (gl:vertex x y (+ z r))(gl:vertex (+ x r) y (+ z r))
-    (gl:vertex (+ x r) (+ y r) (+ z r)) (gl:vertex x (+ y r) (+ z r)))
-  (gl:with-primitives :quads
-    (gl:vertex x (+ y r) z) (gl:vertex x (+ y r) (+ z r))
-    (gl:vertex (+ x r) (+ y r) (+ z r)) (gl:vertex (+ x r) (+ y r) z))
-  (gl:with-primitives :quads
-    (gl:vertex (+ x r) y z) (gl:vertex (+ x r) (+ y r) z)
-    (gl:vertex (+ x r) (+ y r) (+ z r)) (gl:vertex (+ x r) y (+ z r)))
-  )
 
 ;;entry point
 (defun main ()
   (let ((cam (make-camera :posx 0 :posy 0 :posz 0
 			  :dirx 0 :diry 0 :dirz 0))
-	(current-key (make-instance 'key-state)))
+	(current-key (make-instance 'key-state))
+	(frame-timer 0))
     (sdl:with-init ()
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -148,9 +87,10 @@
       (glu:perspective 30 (/ +window-width+ +window-height+) 1 100)
 
       ;;
-      (gl:translate 0 0 -5)
+      (gl:translate 0 0 0)
 
       (camera-pos cam -20 -20 20)
+      (camera-dir cam 0 0 0)
       
       ;;set camera position and direction of looking to
       (glu:look-at (camera-posx cam) (camera-posy cam) (camera-posz cam)
@@ -171,19 +111,51 @@
 	(:idle ()
 	       (gl:clear :color-buffer-bit :depth-buffer-bit)
 	       (gl:color 1 1 1)
-
-	       (dotimes (n 99)
-		 (dotimes (i 99)
+	       
+	       (dotimes (n 15)
+		 (dotimes (i 15)
 		   (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
-		       (gl:color 1 0 0)
-		       (gl:color 0 1 0))
-		   (face-cube i n 0 1)))
+		       (face-frame-cube i n 0 1 1 0 0)
+		       (face-frame-cube i n 0 1 0 1 0))))
 	       
+	       (gl:push-matrix)
+	       
+	       (face-frame-cube
+		1 1 1
+		2
+		0 0 1)
+	       (gl:pop-matrix)
+	       
+	       ;;dir
+	       (gl:color 1 0 0)
+	       (gl:with-primitives :lines
+		 (gl:vertex -100 0 0)
+		 (gl:vertex 100 0 0))
+	       (gl:color 0 1 0)
+	       (gl:with-primitives :lines
+		 (gl:vertex 0 -100 0)
+		 (gl:vertex 0 100 0))
 	       (gl:color 0 0 1)
-	       (face-cube 0 0 1 1)
-
-	       (test-input-key current-key)
+	       (gl:with-primitives :lines
+		 (gl:vertex 0 0 -100)
+		 (gl:vertex 0 0 100))
 	       
-	       (sdl:update-display))))))
+	       (test-input-key current-key)
+
+	       (gl:push-matrix)
+	       (glu:ortho-2d 0.0 +window-width+ 0.0 +window-height+)
+	       (gl:matrix-mode :modelview)
+	       (gl:push-matrix)
+	       (gl:load-identity)
+	       (gl:color 1 0 1)
+	       (gl:with-primitives :quads
+		 (gl:vertex 0 0 0) (gl:vertex 10 0 0)
+		 (gl:vertex 10 10 0) (gl:vertex 0 10 0))
+	       (gl:matrix-mode :modelview)
+	       (gl:pop-matrix)
+	       (gl:matrix-mode :projection)
+	       (gl:pop-matrix)
+	       (sdl:update-display)
+	       (setf frame-timer (+ 1 frame-timer)))))))
 
 (main)

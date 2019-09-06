@@ -39,8 +39,13 @@
 	   (setf sdown key-press)))))
 
 (defun test-input-key (current-key)
-  (with-slots (right left sright) current-key
-    (and right (format t "-> "))
-    (and left (format t "<- "))
-    (and sright (format t "A"))
+  (with-slots (right left up down sright sleft sup sdown) current-key
+    (and right (format t "→ "))
+    (and left (format t "← "))
+    (and up (format t "↑ "))
+    (and down (format t "↓ "))
+    (and sright (format t "D "))
+    (and sleft (format t "A "))
+    (and sup (format t "W "))
+    (and sdown (format t "S "))
     (fresh-line)))

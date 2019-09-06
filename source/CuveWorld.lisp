@@ -5,6 +5,7 @@
 
 ;;load file
 (load "key.lisp" :external-format :utf-8)
+(load "camera.lisp" :external-format :utf-8)
 (load "loader.lisp" :external-format :utf-8)
 (load "stage.lisp" :external-format :utf-8)
 ;;(load "status.lisp" :external-format :utf-8)
@@ -17,66 +18,9 @@
 
 (defvar *object-num* 0)
 
-
-;;
-(defstruct camera
-  (posx 0)
-  (posy 0)
-  (posz 0)
-  (dirx 0)
-  (diry 0)
-  (dirz 0))
-
-(defun camera-pos (camera x y z)
-  (setf (camera-posx camera) x)
-  (setf (camera-posy camera) y)
-  (setf (camera-posz camera) z))
-
-(defun camera-dir (camera x y z)
-  (setf (camera-dirx camera) x)
-  (setf (camera-diry camera) y)
-  (setf (camera-dirz camera) z))
-
-(defun camera-move (current-key camera)
-  (with-slots (right left up down) current-key
-    (and left (progn
-		(setf (camera-posx camera) (+ (camera-posx camera) 0.1))
-		(setf (camera-posy camera) (+ (camera-posy camera) -0.1))
-		(setf (camera-posz camera) (+ (camera-posz camera) 0))
-		(gl:translate 0.1 -0.1 0)))
-    (and right (progn
-		 (setf (camera-posx camera) (+ (camera-posx camera) -0.1))
-		 (setf (camera-posy camera) (+ (camera-posy camera) 0.1))
-		 (setf (camera-posz camera) (+ (camera-posz camera) 0))
-		 (gl:translate -0.1 0.1 0)))
-    (and down (progn
-		(setf (camera-posx camera) (+ (camera-posx camera) 0.1))
-		(setf (camera-posy camera) (+ (camera-posy camera) 0.1))
-		(setf (camera-posz camera) (+ (camera-posz camera) 0))
-		(gl:translate 0.1 0.1 0)))
-    (and up (progn
-	      (setf (camera-posx camera) (+ (camera-posx camera) -0.1))
-	      (setf (camera-posy camera) (+ (camera-posy camera) -0.1))
-	      (setf (camera-posz camera) (+ (camera-posz camera) 0))
-	      (gl:translate -0.1 -0.1 0)))))
-
-(defun camera-angle (current-key camera)
-  (with-slots (sright sleft sup sdown) current-key
-    (and sright (progn
-		  (gl:push-matrix)
-		  (gl:translate (camera-posx camera)
-				(camera-posy camera)
-				(camera-posz camera))
-		  (gl:rotate -10 0 0 1)
-		  (gl:pop-matrix)))
-    (and sleft (gl:rotate 10 0 0 1))
-    (and sup (gl:rotate -10 1 1 0))
-    (and sdown (gl:rotate 10 1 1 0))))
-
 ;;entry point
 (defun main ()
-  (let ((cam (make-camera :posx 0 :posy 0 :posz 0
-			  :dirx 0 :diry 0 :dirz 0))
+  (let ((cam (make-instance 'camera))
 	(current-key (make-instance 'key-state))
 	(frame-timer 0))
     (sdl:with-init ()
@@ -124,13 +68,14 @@
       ;;
       (gl:translate 0 0 0)
 
-      (camera-pos cam -20 -20 20)
-      (camera-dir cam 0 0 0)
-      
-      ;;set camera position and direction of looking to
-      (glu:look-at (camera-posx cam) (camera-posy cam) (camera-posz cam)
-		   (camera-dirx cam) (camera-diry cam) (camera-dirz cam)
-		   0.0 0.0 1.0)
+      (set-pos cam -20 -20 20)
+      (set-angle cam 0 0 0)
+
+      (with-slots (posx posy posz anglex angley anglez) cam
+	;;set camera position and direction of looking to
+	(glu:look-at posx posy posz
+		     anglex angley anglez
+		     0.0 0.0 1.0))
       
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;;game loop
@@ -147,15 +92,21 @@
 	       (gl:clear :color-buffer-bit :depth-buffer-bit)
 	       (gl:color 1 1 1)
 
-	       (camera-move current-key cam)
-	       (camera-angle current-key cam)
+	       ;;mode 3d render
+	       (gl:matrix-mode :projection)
+	       (and (> frame-timer 0) (gl:pop-matrix))
+	       (gl:matrix-mode :modelview)
+	       (and (> frame-timer 0) (gl:pop-matrix))
+	       (gl:load-identity)
 	       
+	       (move-angle current-key cam)
+
 	       (dotimes (n 15)
 		 (dotimes (i 15)
 		   (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
 		       (face-frame-cube i n 0 1 1 0 0)
 		       (face-frame-cube i n 0 1 0 1 0))))
-	       
+
 	       (gl:push-matrix)
 	       
 	       (face-frame-cube
@@ -163,8 +114,8 @@
 		2
 		0 0 1)
 	       (gl:pop-matrix)
-	       
-	       ;;dir
+
+	       ;;axis
 	       (gl:color 1 0 0)
 	       (gl:with-primitives :lines
 		 (gl:vertex -100 0 0)
@@ -177,24 +128,26 @@
 	       (gl:with-primitives :lines
 		 (gl:vertex 0 0 -100)
 		 (gl:vertex 0 0 100))
-	       
-	       
+
+	       ;;mode 2d render
+	       (gl:matrix-mode :projection)
+	       (gl:push-matrix)
+	       (gl:load-identity)
+	       (gl:ortho 0.0 +window-width+ +window-height+ 0.0 -1.0 1.0)
+	       (gl:matrix-mode :modelview)
+	       (gl:push-matrix)
+	       (gl:load-identity)
+
+	       (gl:with-primitives :quads
+		 (gl:color 0 1 0)
+		 (gl:vertex 140 400 0)
+		 (gl:vertex 140 450 0)
+		 (gl:color 1 0 0)
+		 (gl:vertex 500 450 0)
+		 (gl:vertex 500 400 0))
+
 	       (test-input-key current-key)
 
-	       ;;(gl:push-matrix)
-	       ;;(glu:ortho-2d 0.0 +window-width+ 0.0 +window-height+)
-	       ;;(gl:matrix-mode :modelview)
-	       ;;(gl:push-matrix)
-	       ;;(gl:load-identity)
-	       ;;(gl:color 1 0 1)
-	       ;;(gl:with-primitives :quads
-	       ;;(gl:vertex 0 0 0) (gl:vertex 10 0 0)
-	       ;;(gl:vertex 10 10 0) (gl:vertex 0 10 0))
-	       ;;(gl:matrix-mode :modelview)
-	       ;;(gl:pop-matrix)
-	       ;;(gl:matrix-mode :projection)
-	       ;;(gl:pop-matrix)
-	       
 	       (sdl:update-display)
 	       (setf frame-timer (+ 1 frame-timer)))))))
 

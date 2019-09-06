@@ -20,7 +20,9 @@
 
 (defun font-example ()
   (sdl:with-init ()
-    (sdl:window 600 96 :title-caption "SDL-TTF Font Example" :icon-caption "SDL-TTF Font Example")
+    (sdl:window 600 96
+		:title-caption "SDL-TTF Font Example"
+		:icon-caption "SDL-TTF Font Example")
     (setf (sdl:frame-rate) 30)
     (sdl:fill-surface sdl:*white* :surface sdl:*default-display*)
     (unless (sdl:initialise-default-font *ttf-font-msgothic*)
@@ -31,7 +33,7 @@
 			      sdl:*black*
 			      sdl:*yellow*)
     ;;(sdl:draw-string-blended-* "Text UTF8 - Blended 日本語テスト" 0 64
-    ;;    :color sdl:*black*)
+    ;;:color sdl:*black*)
     (sdl:update-display)
     (sdl:with-events ()
       (:quit-event () t)
@@ -40,4 +42,4 @@
 		       (when (sdl:key-down-p :sdl-key-escape)
 			 (sdl:push-quit-event))))))
 
-(font-example)
+;;(font-example)

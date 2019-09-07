@@ -170,3 +170,20 @@
     (gl:vertex 1 1 0)
     (gl:vertex 1 1 1))
   (gl:pop-matrix))
+
+(defun axis (r)
+  ;;axis
+  (gl:push-matrix)
+  (gl:color 1 0 0)
+  (gl:with-primitives :lines
+    (gl:vertex (- 0 r) 0 0)
+    (gl:vertex r 0 0))
+  (gl:color 0 1 0)
+  (gl:with-primitives :lines
+    (gl:vertex 0 (- 0 r) 0)
+    (gl:vertex 0 r 0))
+  (gl:color 0 0 1)
+  (gl:with-primitives :lines
+    (gl:vertex 0 0 (- 0 r))
+    (gl:vertex 0 0 r))
+  (gl:pop-matrix))

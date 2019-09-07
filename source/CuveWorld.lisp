@@ -112,24 +112,9 @@
 	       (and (> frame-timer 0) (gl:pop-matrix))
 	       (gl:load-identity)
 
-	       (and (eql *debug* t)
-		    (progn
-		      ;;axis
-		      (gl:push-matrix)
-		      (gl:color 1 0 0)
-		      (gl:with-primitives :lines
-			(gl:vertex -100 0 0)
-			(gl:vertex 100 0 0))
-		      (gl:color 0 1 0)
-		      (gl:with-primitives :lines
-			(gl:vertex 0 -100 0)
-			(gl:vertex 0 100 0))
-		      (gl:color 0 0 1)
-		      (gl:with-primitives :lines
-			(gl:vertex 0 0 -100)
-			(gl:vertex 0 0 100))
-		      (gl:pop-matrix)))
+	       (and (eql *debug* t) (axis 100))
 	       
+	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	       ;;camera
 	       ;;(move-angle current-key cam)
 	       (gl:rotate frame-timer 0.0 1.0 0.0)
@@ -137,14 +122,14 @@
 	       (gl:rotate 0 0.0 0.0 1.0)
 	       (gl:translate 0 0 0)
 
-	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	       ;;3D objects
 	       ;;(gl:push-matrix)
 	       (dotimes (n 15)
 		 (dotimes (i 15)
 		   (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
-		       (face-frame-cube i 0 n 1 1 0 0)
-		       (face-frame-cube i 0 n 1 0 1 0))))
+		       (face-frame-cube i 0 n 1 0 0 1)
+		       (face-frame-cube i 0 n 1 1 1 0))))
 	       ;;(gl:pop-matrix)
 
 	       ;;(gl:push-matrix)
@@ -166,7 +151,8 @@
 	       (face-frame-cube 0 -10 0 2 1 1 1)
 	       (face-frame-cube 0 0 -10 2 1 1 1)
 	       (gl:pop-matrix)
-	       
+
+	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	       ;;mode 2d render
 	       (gl:matrix-mode :projection)
 	       (gl:push-matrix)
@@ -176,6 +162,8 @@
 	       (gl:push-matrix)
 	       (gl:load-identity)
 
+	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	       ;;2D objects
 	       (gl:translate 140 400 0)
 	       (gl:translate (* 2 (mod frame-timer 180)) 0 0)
 	       (gl:rotate (mod frame-timer 360) 0.0 0.0 1.0)
@@ -194,6 +182,7 @@
 					 sdl:*black*
 					 sdl:*yellow*)
 
+	       ;;others
 	       (test-input-key current-key)
 
 	       (gl:flush)

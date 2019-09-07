@@ -1,3 +1,7 @@
+### Cuve World(仮称)
+- 探索型RPG
+- 言語 SBCL
+
 ### ./source内のファイル
 - キューブワールード：CuveWorld.lisp
 - 画像の読み込み：loader.lisp

@@ -13,7 +13,7 @@
 (load "stage.lisp" :external-format :utf-8)
 ;;(load "status.lisp" :external-format :utf-8)
 (load "objects.lisp" :external-format :utf-8)
-(load "ttf.lisp" :external-format :utf-8)
+;;(load "ttf.lisp" :external-format :utf-8)
 
 ;;window frame size
 (defconstant +window-width+ 640)
@@ -42,8 +42,6 @@
 		  :opengl-attributes '((:sdl-gl-doublebuffer 1)
 				       (:SDL-GL-DEPTH-SIZE 16)))
       (setf (sdl:frame-rate) +fps+)
-      (unless (sdl:initialise-default-font *ttf-font-msgothic*)
-	(error "FONT-EXAMPLE: Cannot initialize the default font."))
       
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;;init
@@ -125,31 +123,29 @@
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	       ;;3D objects
 	       ;;(gl:push-matrix)
-	       (dotimes (n 15)
-		 (dotimes (i 15)
-		   (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
-		       (face-frame-cube i 0 n 1 0 0 1)
-		       (face-frame-cube i 0 n 1 1 1 0))))
-	       ;;(gl:pop-matrix)
-
-	       ;;(gl:push-matrix)
-	       (gl:load-identity)
-	       (gl:rotate 45 0 1 0)
-	       (face-frame-cube
-		1 1 1
-		2
-		0 0 1)
-	       ;;(gl:pop-matrix)
+	       ;;stage
+	       (gl:push-matrix)
+	       (dotimes (l 4)
+		 (gl:rotate 90 0 1 0)
+		 (dotimes (n 15)
+		   (dotimes (i 15)
+		     (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
+			 (face-frame-cube i 0 n 1 0 0 1)
+			 (face-frame-cube i 0 n 1 1 1 0)))))
+	       (gl:pop-matrix)
 
 	       ;;cube
+	       (gl:color 1 0 0)
 	       (gl:push-matrix)
-	       (gl:translate (mod frame-timer 100) 0 0)
-	       (face-frame-cube 10 0 0 2 1 1 1)
-	       (face-frame-cube 0 10 0 2 1 1 1)
-	       (face-frame-cube 0 0 10 2 1 1 1)
-	       (face-frame-cube -10 0 0 2 1 1 1)
-	       (face-frame-cube 0 -10 0 2 1 1 1)
-	       (face-frame-cube 0 0 -10 2 1 1 1)
+	       (gl:translate 0 2 0)
+	       (gl:rotate 0 0 0 0)
+	       (dotimes (i 8)
+		 (gl:push-matrix)
+		 (gl:rotate (* 45 i) 0 1 0)
+		 (gl:translate 10 0 0)
+		 (face-cube 0 0 0 1)
+		 (gl:pop-matrix))
+	       
 	       (gl:pop-matrix)
 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -167,7 +163,7 @@
 	       (gl:translate 140 400 0)
 	       (gl:translate (* 2 (mod frame-timer 180)) 0 0)
 	       (gl:rotate (mod frame-timer 360) 0.0 0.0 1.0)
-
+	       
 	       (gl:with-primitives :quads
 		 (gl:color 0 1 0)
 		 (gl:vertex 0 0 0)
@@ -176,12 +172,6 @@
 		 (gl:vertex 360 50 0)
 		 (gl:vertex 360 0 0))
 	       
-	       (sdl:draw-string-solid-* "Text UTF8 - Solid" 10 0
-					:color sdl:*white*)
-	       (sdl:draw-string-shaded-* "Text UTF8 - Shaded 日本語テスト" 0 32
-					 sdl:*black*
-					 sdl:*yellow*)
-
 	       ;;others
 	       (test-input-key current-key)
 

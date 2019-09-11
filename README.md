@@ -14,10 +14,13 @@
 - カメラオブジェクト関係：camera.lisp
 - その他（Path,）：others.lisp
 - テキストボックス：textbox.lisp
-- SDLのfont描画：ttf.lisp
+- font描画：ttf.lisp
 
 ### ./ttf
 フォントの格納場所
+
+### ./texture
+画像置き場
 
 ### プログラムの起動方法
 - emacsの起動
@@ -30,8 +33,8 @@
 #### step2
 - install quicklisp
 #### step3
-- qucilload libs
+- quickload libs
 #### step4
 - git clone our_project
 #### step5
-- compile & runA
+- compile & run

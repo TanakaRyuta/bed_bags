@@ -24,3 +24,14 @@
 - ミニバッファ内にAlt+x : slimeと入力し、REPLを起動
 - コンパイルさせたい箇所を指定し、Ctrl + c を二回押下
 - REPL内で(main)で実行
+### 環境構築
+#### step1
+- install emacs & sbcl
+#### step2
+- install quicklisp
+#### step3
+- qucilload libs
+#### step4
+- git clone our_project
+#### step5
+- compile & runA

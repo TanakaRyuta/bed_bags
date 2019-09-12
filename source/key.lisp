@@ -29,7 +29,7 @@
 	  ((sdl:key= key :sdl-key-D)     (setf sright key-press))
 	  ((sdl:key= key :sdl-key-W)     (setf sup key-press))
 	  ((sdl:key= key :sdl-key-S)     (setf sdown key-press))
-	  (#|(sdl:key= key :sdl-key-)    (setf key key-press))|#))
+	  #|((sdl:key= key :sdl-key-)    (setf key key-press))|#)))
 
 (defun test-input-key (current-key)
   (with-slots (right left up down sright sleft sup sdown) current-key

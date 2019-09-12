@@ -1,7 +1,9 @@
-(ql:quickload :lispbuilder-sdl)
-(ql:quickload :cl-opengl)
-(ql:quickload :cl-glu)
-;;(ql:quickload :cl-glut)
+;;load libs
+(ql:quickload '(:lispbuilder-sdl
+		:cl-opengl
+		:cl-glu
+		;;:cl-glut
+		:glisph))
 
 (defvar *debug* nil)
 (setf *debug* t)

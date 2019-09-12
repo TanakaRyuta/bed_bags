@@ -1,7 +1,45 @@
-(ql:quickload :lispbuilder-sdl)
-(ql:quickload :lispbuilder-sdl-ttf)
+(ql:quickload '(:lispbuilder-sdl
+		:lispbuilder-sdl-ttf
+		:glisph))
 
 (load "others.lisp" :external-format :utf-8)
+
+(defvar *debug* nil)
+
+(defvar *font* nil)
+(defvar *table* nil)
+(defvar *text* #("12345"))
+
+(defun init-gli (width height)
+  (gli:init width height)
+
+  ;;set font
+  (setf *font*
+	(gli:open-font-loader (file-path "../ttf/" "PixelMplus10-Bold.ttf")))
+  ;;make font-table
+  (setf *table* (gli:make-glyph-table *font*))
+  (loop for text across *text* do (gli:regist-glyphs *table* text))
+  (setf *text*
+	(gli:draw *table*
+		  `(:size 24 :x 0 :y 0
+			  :text (aref *text* 0)))))
+
+
+(defmethod draw-text ()
+  (gl:push-matrix)
+  (gli:render *text*)
+  (gl:pop-matrix))
+
+(defmethod close-gli ()
+  (gli:delete-glyph-table *table*)
+  (gli:finalize))
+
+
+
+
+
+
+
 
 ;;define fonts
 (defparameter *ttf-font-YUYUKO*
@@ -13,33 +51,3 @@
   (make-instance 'sdl:ttf-font-definition
 		 :size 32
 		 :filename (FILE-PATH "../ttf/" "msgothic.ttc")))
-
-(defun init-font(font)
-  (unless (sdl:initialise-default-font font)
-    (error "set default font.")))
-
-(defun font-example ()
-  (sdl:with-init ()
-    (sdl:window 600 96
-		:title-caption "SDL-TTF Font Example"
-		:icon-caption "SDL-TTF Font Example")
-    (setf (sdl:frame-rate) 30)
-    (sdl:fill-surface sdl:*white* :surface sdl:*default-display*)
-    (unless (sdl:initialise-default-font *ttf-font-msgothic*)
-      (error "FONT-EXAMPLE: Cannot initialize the default font."))
-    (sdl:draw-string-solid-* "Text UTF8 - Solid 日本語テスト" 0 0
-			     :color sdl:*black*)
-    (sdl:draw-string-shaded-* "Text UTF8 - Shaded 日本語テスト" 0 32
-			      sdl:*black*
-			      sdl:*yellow*)
-    ;;(sdl:draw-string-blended-* "Text UTF8 - Blended 日本語テスト" 0 64
-    ;;:color sdl:*black*)
-    (sdl:update-display)
-    (sdl:with-events ()
-      (:quit-event () t)
-      (:video-expose-event () (sdl:update-display))
-      (:key-down-event ()
-		       (when (sdl:key-down-p :sdl-key-escape)
-			 (sdl:push-quit-event))))))
-
-;;(font-example)

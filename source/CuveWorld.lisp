@@ -6,7 +6,7 @@
 		:glisph))
 
 (defvar *debug* nil)
-(setf *debug* t)
+(setf *debug* nil)
 
 ;;load file
 (load "key.lisp" :external-format :utf-8)
@@ -15,7 +15,7 @@
 (load "stage.lisp" :external-format :utf-8)
 ;;(load "status.lisp" :external-format :utf-8)
 (load "objects.lisp" :external-format :utf-8)
-;;(load "ttf.lisp" :external-format :utf-8)
+(load "ttf.lisp" :external-format :utf-8)
 
 ;;window frame size
 (defconstant +window-width+ 640)
@@ -42,14 +42,19 @@
 		  ;;:no-frame
 		  :opengl t
 		  :opengl-attributes '((:sdl-gl-doublebuffer 1)
-				       (:SDL-GL-DEPTH-SIZE 16)))
+				       (:SDL-GL-DEPTH-SIZE 16)
+				       (:SDL-GL-STENCIL-SIZE 4)
+				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
       (setf (sdl:frame-rate) +fps+)
       
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
       ;;init
+
+      ;;(init-gli +window-width+ +window-height+)
       
       ;;clear background
-      (gl:clear-color 0 0 0 0)
+      (gl:clear-color 0 0 0 1)
+      (gl:clear-stencil 0)
       
       ;;set matrix-mode
       ;; :modelview  -> モデルビュー行列
@@ -101,7 +106,8 @@
 	(:idle ()
 	       (gl:clear :color-buffer-bit
 			 :depth-buffer-bit
-			 :accum-buffer-bit)
+			 :accum-buffer-bit
+			 :stencil-buffer-bit)
 	       (gl:color 1 1 1)
 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -150,6 +156,8 @@
 	       
 	       (gl:pop-matrix)
 
+	       ;;(draw-str)
+	       
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	       ;;mode 2d render
 	       (gl:matrix-mode :projection)
@@ -179,6 +187,9 @@
 
 	       (gl:flush)
 	       (sdl:update-display)
-	       (setf frame-timer (+ 1 frame-timer)))))))
+	       (setf frame-timer (+ 1 frame-timer))))))
+
+  ;;(close-gli)
+  )
 
 (main)

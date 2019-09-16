@@ -1,5 +1,6 @@
 ;;load libs
 (ql:quickload '(:lispbuilder-sdl
+		:lispbuilder-sdl-image
 		:cl-opengl
 		:cl-glu
 		;;:cl-glut
@@ -15,6 +16,7 @@
 (load "stage.lisp" :external-format :utf-8)
 ;;(load "status.lisp" :external-format :utf-8)
 (load "objects.lisp" :external-format :utf-8)
+(load "others.lisp" :external-format :utf-8)
 (load "ttf.lisp" :external-format :utf-8)
 
 ;;window frame size
@@ -46,20 +48,12 @@
 				       (:SDL-GL-STENCIL-SIZE 4)
 				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
       (setf (sdl:frame-rate) +fps+)
-      (let ((image (load-png-image (file-path "../texture/" "gazo.png")))
-	    (texture (car (gl:gen-textures 1))))
-    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+      (setf cl-opengl-bindings:*gl-get-proc-address*
+	    #'sdl-cffi::sdl-gl-get-proc-address)
+      (let ((texture-image (load-a-texture
+			    "gazo.png")))
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;;init
-
-	(gl:bind-texture :texture-2d texture)
-	(gl:tex-parameter :texture-2d :texture-min-filter :linear)
-	;; these are actually the defaults, just here for reference
-	(gl:tex-parameter :texture-2d :texture-mag-filter :linear)
-	(gl:tex-parameter :texture-2d :texture-wrap-s :clamp-to-edge)
-	(gl:tex-parameter :texture-2d :texture-wrap-t :clamp-to-edge)
-	(gl:tex-parameter :texture-2d :texture-border-color '(0 0 0 0))
-	(gl:tex-image-2d :texture-2d 0 :rgba 8 8 0
-			 :luminance :unsigned-byte image)
 	
 	;;clear background
 	(gl:clear-color 0 0 0 1)
@@ -140,13 +134,16 @@
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		 ;;3D objects
 		 ;;(gl:push-matrix)
+		 (gl:enable :blend)
+		 (gl:blend-func :src-alpha :one-minus-src-alpha)
+		 (gl:clear :color-buffer-bit)
 		 
 		 (gl:push-matrix)
 		 (gl:load-identity)
 		 (gl:color 1 0 0)
-		 (when texture
+		 (when texture-image
 		   (gl:enable :texture-2d)
-		   (gl:bind-texture :texture-2d texture))
+		   (gl:bind-texture :texture-2d texture-image))
 		 (gl:with-primitives :quads
 		   (gl:tex-coord 0 1)
 		   (gl:vertex 0 3 0)
@@ -214,7 +211,7 @@
 
 		 (gl:flush)
 		 (sdl:update-display)
-		 (gl:delete-textures (list texture))
+		 (gl:delete-textures (list texture-image))
 		 (setf frame-timer (+ 1 frame-timer))))))))
 
 (main)

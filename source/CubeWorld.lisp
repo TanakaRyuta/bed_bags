@@ -3,6 +3,7 @@
 		:lispbuilder-sdl-image
 		:cl-opengl
 		:cl-glu
+		:zpng
 		;;:cl-glut
 		))
 
@@ -47,14 +48,13 @@
 				       (:SDL-GL-DEPTH-SIZE 16)
 				       (:SDL-GL-STENCIL-SIZE 4)
 				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
+      (sdl-image:init-image :png :bmp)
       (setf (sdl:frame-rate) +fps+)
-      (setf cl-opengl-bindings:*gl-get-proc-address*
-	    #'sdl-cffi::sdl-gl-get-proc-address)
-      (let ((texture-image (load-a-texture
-			    "gazo.png")))
+      (let ((texture (load-png-image (file-path "../texture/" "ss.png"))))
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;;init
-	
+
+	(gl:pixel-store :unpack-alignment 1)
 	;;clear background
 	(gl:clear-color 0 0 0 1)
 	(gl:clear-stencil 0)
@@ -134,16 +134,11 @@
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		 ;;3D objects
 		 ;;(gl:push-matrix)
-		 (gl:enable :blend)
-		 (gl:blend-func :src-alpha :one-minus-src-alpha)
-		 (gl:clear :color-buffer-bit)
-		 
 		 (gl:push-matrix)
 		 (gl:load-identity)
 		 (gl:color 1 0 0)
-		 (when texture-image
-		   (gl:enable :texture-2d)
-		   (gl:bind-texture :texture-2d texture-image))
+		 (gl:enable :texture-2d)
+		 (gl:bind-texture :texture-2d texture)
 		 (gl:with-primitives :quads
 		   (gl:tex-coord 0 1)
 		   (gl:vertex 0 3 0)
@@ -153,6 +148,7 @@
 		   (gl:vertex 4 3 4)
 		   (gl:tex-coord 0 0)
 		   (gl:vertex 4 3 0))
+		 (gl:disable :texture-2d)
 		 (gl:pop-matrix)
 		 
 		 ;;stage
@@ -179,8 +175,6 @@
 		   (gl:pop-matrix))
 		 
 		 (gl:pop-matrix)
-
-		 ;;(draw-str)
 		 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		 ;;mode 2d render
@@ -211,7 +205,7 @@
 
 		 (gl:flush)
 		 (sdl:update-display)
-		 (gl:delete-textures (list texture-image))
+		 (gl:delete-textures (list texture))
 		 (setf frame-timer (+ 1 frame-timer))))))))
 
 (main)

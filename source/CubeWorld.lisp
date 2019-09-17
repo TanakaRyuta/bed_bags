@@ -1,9 +1,9 @@
 ;;load libs
 (ql:quickload '(:lispbuilder-sdl
-		:lispbuilder-sdl-image
 		:cl-opengl
 		:cl-glu
 		:zpng
+		:png-read
 		;;:cl-glut
 		))
 
@@ -48,13 +48,16 @@
 				       (:SDL-GL-DEPTH-SIZE 16)
 				       (:SDL-GL-STENCIL-SIZE 4)
 				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
-      (sdl-image:init-image :png :bmp)
       (setf (sdl:frame-rate) +fps+)
-      (let ((texture (load-png-image (file-path "../texture/" "ss.png"))))
+      (let ((image (load-png-texture (file-path "../texture/" "siki.png")))
+	    (texture (car (gl:gen-textures 1)))
+	    (image-data nil))
+	
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;;init
-
-	(gl:pixel-store :unpack-alignment 1)
+	(setf image-data (make-array (list (* (png-read:width image)
+					      (png-read:height image)
+					      1))))
 	;;clear background
 	(gl:clear-color 0 0 0 1)
 	(gl:clear-stencil 0)
@@ -130,82 +133,89 @@
 		 (gl:rotate 0 1.0 0.0 0.0)
 		 (gl:rotate 0 0.0 0.0 1.0)
 		 (gl:translate 0 0 0)
-
+		 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		 ;;3D objects
 		 ;;(gl:push-matrix)
 		 (gl:push-matrix)
 		 (gl:load-identity)
-		 (gl:color 1 0 0)
-		 (gl:enable :texture-2d)
 		 (gl:bind-texture :texture-2d texture)
-		 (gl:with-primitives :quads
-		   (gl:tex-coord 0 1)
-		   (gl:vertex 0 3 0)
-		   (gl:tex-coord 1 1)
-		   (gl:vertex 0 3 4)
-		   (gl:tex-coord 1 0)
-		   (gl:vertex 4 3 4)
-		   (gl:tex-coord 0 0)
-		   (gl:vertex 4 3 0))
-		 (gl:disable :texture-2d)
-		 (gl:pop-matrix)
-		 
-		 ;;stage
-		 (gl:push-matrix)
-		 (dotimes (l 4)
-		   (gl:rotate 90 0 1 0)
-		   (dotimes (n 15)
-		     (dotimes (i 15)
-		       (if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
-			   (face-frame-cube i 0 n 1 0 0 1)
-			   (face-frame-cube i 0 n 1 1 1 0)))))
-		 (gl:pop-matrix)
+		 (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
+		 (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
+		 (gl:tex-image-2d :texture-2d 0 :rgb
+				  (png-read:width image)
+				  (png-read:height image)
+				  0 :rgb :unsigned-byte image-data))
+	  (gl:color 1 0 0)
+	  (gl:enable :texture-2d)
+	  
+	  (gl:with-primitives :quads
+	    (gl:tex-coord 0 1)
+	    (gl:vertex 0 3 0)
+	    (gl:tex-coord 1 1)
+	    (gl:vertex 0 3 4)
+	    (gl:tex-coord 1 0)
+	    (gl:vertex 4 3 4)
+	    (gl:tex-coord 0 0)
+	    (gl:vertex 4 3 0))
+	  (gl:disable :texture-2d)
+	  (gl:pop-matrix)
+	  
+	  ;;stage
+	  (gl:push-matrix)
+	  (dotimes (l 4)
+	    (gl:rotate 90 0 1 0)
+	    (dotimes (n 15)
+	      (dotimes (i 15)
+		(if (eq 0 (mod (+ (+ n 1) (+ i 1)) 2))
+		    (face-frame-cube i 0 n 1 0 0 1)
+		    (face-frame-cube i 0 n 1 1 1 0)))))
+	  (gl:pop-matrix)
 
-		 ;;cube
-		 (gl:color 1 0 0)
-		 (gl:push-matrix)
-		 (gl:translate 0 2 0)
-		 (gl:rotate 0 0 0 0)
-		 (dotimes (i 8)
-		   (gl:push-matrix)
-		   (gl:rotate (* 45 i) 0 1 0)
-		   (gl:translate 10 0 0)
-		   (face-cube 0 0 0 1)
-		   (gl:pop-matrix))
-		 
-		 (gl:pop-matrix)
-		 
+	  ;;cube
+	  (gl:color 1 0 0)
+	  (gl:push-matrix)
+	  (gl:translate 0 2 0)
+	  (gl:rotate 0 0 0 0)
+	  (dotimes (i 8)
+	    (gl:push-matrix)
+	    (gl:rotate (* 45 i) 0 1 0)
+	    (gl:translate 10 0 0)
+	    (face-cube 0 0 0 1)
+	    (gl:pop-matrix))
+	  
+	  (gl:pop-matrix)
+	  
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		 ;;mode 2d render
-		 (gl:matrix-mode :projection)
-		 (gl:push-matrix)
-		 (gl:load-identity)
-		 (gl:ortho 0.0 +window-width+ +window-height+ 0.0 -1.0 1.0)
-		 (gl:matrix-mode :modelview)
-		 (gl:push-matrix)
-		 (gl:load-identity)
+	  ;;mode 2d render
+	  (gl:matrix-mode :projection)
+	  (gl:push-matrix)
+	  (gl:load-identity)
+	  (gl:ortho 0.0 +window-width+ +window-height+ 0.0 -1.0 1.0)
+	  (gl:matrix-mode :modelview)
+	  (gl:push-matrix)
+	  (gl:load-identity)
 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		 ;;2D objects
-		 (gl:translate 140 400 0)
-		 (gl:translate (* 2 (mod frame-timer 180)) 0 0)
-		 (gl:rotate (mod frame-timer 360) 0.0 0.0 1.0)
-		 
-		 (gl:with-primitives :quads
-		   (gl:color 0 1 0)
-		   (gl:vertex 0 0 0)
-		   (gl:vertex 0 50 0)
-		   (gl:color 1 0 0)
-		   (gl:vertex 360 50 0)
-		   (gl:vertex 360 0 0))
-		 
-		 ;;others
-		 (test-input-key current-key)
+	  ;;2D objects
+	  (gl:translate 140 400 0)
+	  (gl:translate (* 2 (mod frame-timer 180)) 0 0)
+	  (gl:rotate (mod frame-timer 360) 0.0 0.0 1.0)
+	  
+	  (gl:with-primitives :quads
+	    (gl:color 0 1 0)
+	    (gl:vertex 0 0 0)
+	    (gl:vertex 0 50 0)
+	    (gl:color 1 0 0)
+	    (gl:vertex 360 50 0)
+	    (gl:vertex 360 0 0))
+	  
+	  ;;others
+	  (test-input-key current-key)
 
-		 (gl:flush)
-		 (sdl:update-display)
-		 (gl:delete-textures (list texture))
-		 (setf frame-timer (+ 1 frame-timer))))))))
+	  (gl:flush)
+	  (sdl:update-display)
+	  (gl:delete-textures (list texture))
+	  (incf frame-timer)))))))
 
 (main)

@@ -1,11 +1,7 @@
 (defun load-png-image (png-file)
-  (sdl:convert-to-display-format :surface (sdl-image:load-image png-file)
-                                 :enable-alpha t
-                                 :pixel-alpha t))
-(defun load-texture (png-file)
-  (let ((image (load-png-image png-file))
-	(texture (car (gl:gen-textures 1))))
-    (gl:bind-texture :texture-2d texture)
-    (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
-    (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
-    (gl:tex-image-2d :texture-2d 0 :rgb 1280 720 0 :rgb :unsigned-byte image)))
+  (let ((png (png-read:read-png-file png-file)))
+    png))
+
+(defun load-png-texture (png-file)
+  (let ((png-image (load-png-image png-file)))
+    (png-read:image-data png-image)))

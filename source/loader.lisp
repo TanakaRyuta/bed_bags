@@ -1,14 +1,16 @@
-(defun load-png-image (png-file)
-  (let ((png (png-read:read-png-file png-file)))
-    png))
-
-(defun load-png-texture (png-file)
-  (let ((png-image (load-png-image png-file)))
-    (png-read:image-data png-image)))
-
-(defun test-load-png-image (png-file)
-  (sdl:convert-to-display-format :surface (sdl:load-image png-file)
-                                 :enable-alpha t
-                                 :pixel-alpha t))
-
-
+(ql:quickload :png-read)
+(defun load-texture (png-file width height chunk)
+  (let ((png-image (png-read:read-png-file png-file))
+	(array (make-array (* width height chunk)))
+	)
+    (setf png-image (png-read:image-data png-image))
+    (format t "~a~%" png-image)
+    (dotimes (i width)
+      (dotimes (j height)
+	(dotimes (k chunk)
+	  (setf (aref array (+ k 
+			       (* chunk j)
+			       (* chunk height i)))
+		(aref  png-image i j k)))))
+    (format t "~a~%" array)
+    array))

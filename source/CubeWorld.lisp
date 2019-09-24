@@ -49,17 +49,25 @@
 				       (:SDL-GL-STENCIL-SIZE 4)
 				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
       (setf (sdl:frame-rate) +fps+)
-      (let ((image (load-png-texture (file-path "../texture/" "siki.png")))
-	    (texture (car (gl:gen-textures 1)))
-	    (image-data nil))
+      (let ((texture (car (gl:gen-textures 1)))
+	    (image-data (load-texture (file-path "../texture/" "siki.png")
+				      128 128 3)))
 	
          ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	;;init
-	(setf image-data (make-array (* 600 600
-					;;(png-read:width image)
-					;;(png-read:height image)
-					1)))
-	(format t "image~%~%~a" image)
+
+	;;(setf image-data (make-array (* 600 600
+	;;(png-read:width image)
+	;;(png-read:height image)
+	;;1)))
+	;;(format t "image~%~%~a" image)
+	;;(setf image-data #(255 0 255 255 0 255 255 0 255 255 0 255
+	;;255 0 255 255 0 255 255 0 255 255 0 255
+	;;255 0 255 255 0 255 255 0 255 255 0 255
+	;;255 0 255 255 0 255 255 0 255 255 0 255))
+
+	
+	
 	;;clear background
 	(gl:clear-color 0 0 0 1)
 	(gl:clear-stencil 0)
@@ -91,7 +99,7 @@
 	;;
 	(gl:translate 0 0 0)
 
-	(set-pos cam 50 20 50)
+	(set-pos cam 20 20 0)
 	(set-angle cam 0 0 0)
 
 	(with-slots (posx posy posz anglex angley anglez) cam
@@ -141,26 +149,31 @@
 		 ;;(gl:push-matrix)
 		 (gl:push-matrix)
 		 (gl:load-identity)
-		 
+
+		 (gl:enable :blend)
+		 (gl:blend-func :src-alpha :one-minus-src-alpha)
+		 (gl:clear :color-buffer-bit)
+
+		 (gl:enable :texture-2d)
 		 (gl:bind-texture :texture-2d texture)
 		 (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
 		 (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
 		 (gl:tex-parameter :texture-2d :texture-border-color '(0 0 0 0))
 		 (gl:tex-image-2d :texture-2d 0 :rgba
-				  ;;(png-read:width image) (png-read:height image)
-				  600 600
-				  0 :rgba :unsigned-byte image-data)
-		 ;;(gl:color 1 0 0)
-		 (gl:enable :texture-2d)
-		 
+				  ;;(png-read:width image)
+				  ;;(png-read:height image)
+				  4 4
+				  0 :rgb :unsigned-byte image-data)
+		 (gl:color 1 1 1)
+
 		 (gl:with-primitives :quads
-		   (gl:tex-coord 0 1)
-		   (gl:vertex 0 3 0)
-		   (gl:tex-coord 1 1)
-		   (gl:vertex 0 3 4)
-		   (gl:tex-coord 1 0)
-		   (gl:vertex 4 3 4)
 		   (gl:tex-coord 0 0)
+		   (gl:vertex 0 3 0)
+		   (gl:tex-coord 0 1)
+		   (gl:vertex 0 3 4)
+		   (gl:tex-coord 1 1)
+		   (gl:vertex 4 3 4)
+		   (gl:tex-coord 1 0)
 		   (gl:vertex 4 3 0))
 		 (gl:disable :texture-2d)
 		 (gl:pop-matrix)

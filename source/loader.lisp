@@ -4,7 +4,6 @@
 	(array (make-array (* width height chunk)))
 	)
     (setf png-image (png-read:image-data png-image))
-    (format t "~a~%" png-image)
     (dotimes (i width)
       (dotimes (j height)
 	(dotimes (k chunk)

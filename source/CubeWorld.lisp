@@ -162,10 +162,12 @@
 		 (gl:tex-image-2d :texture-2d 0 :rgba
 				  ;;(png-read:width image)
 				  ;;(png-read:height image)
-				  4 4
+				  128 128
 				  0 :rgb :unsigned-byte image-data)
 		 (gl:color 1 1 1)
-
+		 (gl:scale (+ 1 (* 0.1 (sin (mod frame-timer 360))))
+			   1
+			   (+ 1 (* 0.1 (sin (mod frame-timer 360)))))
 		 (gl:with-primitives :quads
 		   (gl:tex-coord 0 0)
 		   (gl:vertex 0 3 0)

@@ -108,7 +108,7 @@
 (defun face-frame-cube (x y z r cr cg cb)
   (+ *object-num* 1)
   (gl:push-matrix)
-  (gl:load-identity)
+  ;;(gl:load-identity)
   (gl:translate x y z)
   (gl:scale r r r)
 

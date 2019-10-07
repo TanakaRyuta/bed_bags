@@ -11,5 +11,5 @@
 			       (* chunk j)
 			       (* chunk height i)))
 		(aref  png-image i j k)))))
-    (format t "~a~%" array)
+    ;;(format t "~a~%" array)
     array))

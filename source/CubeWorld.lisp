@@ -122,13 +122,13 @@
 		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;camera
+		   ;;set camera pos in local
 		   (gl:push-matrix)
 		   (gl:load-identity)
-		   (glu:look-at posx posy posz
-				anglex angley anglez
-				0.0 1.0 0.0)
 		   (gl:pop-matrix)
 
+		   ;;set 
+		   (gl:translate (* 0.1 frame-timer) 0 0)
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
 		   ;;(gl:push-matrix)

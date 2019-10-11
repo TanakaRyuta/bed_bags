@@ -20,6 +20,7 @@
 (load "others.lisp" :external-format :utf-8)
 (load "ttf.lisp" :external-format :utf-8)
 (load "player.lisp" :external-format :utf-8)
+(load "mouse.lisp" :external-format :utf-8)
 
 
 ;;window frame size
@@ -34,7 +35,8 @@
   (let ((cam (make-instance 'camera))
 	(current-key (make-instance 'key-state))
 	(frame-timer 0)
-	(player (make-instance 'player)))
+	(player (make-instance 'player))
+	(mouse (make-instance 'mouse)))
     (sdl:with-init ()
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,7 +109,9 @@
 	    (:key-up-event (:key key)
 			   (set-key-state key nil current-key))
 	    (:mouse-motion-event (:X x :Y y :X-REL x-rel :Y-REL y-rel)
-				 (format t "~a:~a:~a:~a~%" x y x-rel y-rel))
+					;(format t "~a:~a:~a:~a~%" x y x-rel y-rel))
+				 (set-mouse mosue x y x-rel y-rel))
+
 	    (:idle ()
 		   
 		   (gl:clear :color-buffer-bit
@@ -146,7 +150,7 @@
 		       (gl:translate plposx plposy plposz)
 		       )
 		     )
-		   
+		   (rotate-angle mouse)
 		   ;;set 
 					;	   (gl:translate (* 0.1 frame-timer) 0 0)
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

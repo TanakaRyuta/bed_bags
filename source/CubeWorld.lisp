@@ -106,6 +106,8 @@
 				 (set-key-state key t current-key)))
 	    (:key-up-event (:key key)
 			   (set-key-state key nil current-key))
+	    (:mouse-motion-event (:X x :Y y :X-REL x-rel :Y-REL y-rel)
+				 (format t "~a:~a:~a:~a~%" x y x-rel y-rel))
 	    (:idle ()
 		   
 		   (gl:clear :color-buffer-bit
@@ -128,9 +130,9 @@
 		   ;;camera
 		   ;;set camera pos in local
 		   (gl:color 1 0 0)
-		    (face-cube 0 0 0 3)
+		   (face-cube 0 0 0 3)
 		   (with-slots (plposx plposy plposz) player
-		    
+		     
 					;  (gl:rotate (* 0.05 frame-timer) 0 1 0)
 		     (with-slots (right left up down sright sleft sup sdown) current-key
 					;      (and right (gl:translate 0 0 10))
@@ -146,7 +148,7 @@
 		     )
 		   
 		   ;;set 
-	;	   (gl:translate (* 0.1 frame-timer) 0 0)
+					;	   (gl:translate (* 0.1 frame-timer) 0 0)
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
 		   ;;(gl:push-matrix)

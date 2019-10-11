@@ -19,6 +19,8 @@
 (load "objects.lisp" :external-format :utf-8)
 (load "others.lisp" :external-format :utf-8)
 (load "ttf.lisp" :external-format :utf-8)
+(load "player.lisp" :external-format :utf-8)
+
 
 ;;window frame size
 (defconstant +window-width+ 640)
@@ -31,7 +33,8 @@
 (defun main ()
   (let ((cam (make-instance 'camera))
 	(current-key (make-instance 'key-state))
-	(frame-timer 0))
+	(frame-timer 0)
+	(player (make-instance 'player)))
     (sdl:with-init ()
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -104,6 +107,7 @@
 	    (:key-up-event (:key key)
 			   (set-key-state key nil current-key))
 	    (:idle ()
+		   
 		   (gl:clear :color-buffer-bit
 			     :depth-buffer-bit
 			     :accum-buffer-bit
@@ -123,17 +127,26 @@
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;camera
 		   ;;set camera pos in local
-		   (gl:color 1 1 1)
-		   (face-cube 1 1 1 1)
-		   (gl:rotate (* 0.05 frame-timer) 0 1 0)
-		   (with-slots (right left up down sright sleft sup sdown) current-key
-		     (and right (gl:translate 0 0 10))
-		     (and left (gl:translate 0 0 -10))
-		     (and up (gl:translate 10 0 0))
-		     (and down (gl:translate -10 0 0)))
-
+		   (gl:color 1 0 0)
+		    (face-cube 0 0 0 3)
+		   (with-slots (plposx plposy plposz) player
+		    
+					;  (gl:rotate (* 0.05 frame-timer) 0 1 0)
+		     (with-slots (right left up down sright sleft sup sdown) current-key
+					;      (and right (gl:translate 0 0 10))
+					;     (and left (gl:translate 0 0 -10))
+					;    (and up (gl:translate 10 0 0))
+					;   (and down (gl:translate -10 0 0)))
+		       (and right (set_player_pos player plposx plposy (+ plposz 1)))
+		       (and left (set_player_pos player plposx plposy (- plposz 1)))
+		       (and up (set_player_pos player (+ plposx 1) plposy plposz))
+		       (and down (set_player_pos player (- plposx 1) plposy plposz))
+		       (gl:translate plposx plposy plposz)
+		       )
+		     )
+		   
 		   ;;set 
-		   (gl:translate (* 0.1 frame-timer) 0 0)
+	;	   (gl:translate (* 0.1 frame-timer) 0 0)
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
 		   ;;(gl:push-matrix)

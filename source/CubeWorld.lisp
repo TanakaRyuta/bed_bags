@@ -123,9 +123,14 @@
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;camera
 		   ;;set camera pos in local
-		   (gl:push-matrix)
-		   (gl:load-identity)
-		   (gl:pop-matrix)
+		   (gl:color 1 1 1)
+		   (face-cube 1 1 1 1)
+		   (gl:rotate (* 0.05 frame-timer) 0 1 0)
+		   (with-slots (right left up down sright sleft sup sdown) current-key
+		     (and right (gl:translate 0 0 10))
+		     (and left (gl:translate 0 0 -10))
+		     (and up (gl:translate 10 0 0))
+		     (and down (gl:translate -10 0 0)))
 
 		   ;;set 
 		   (gl:translate (* 0.1 frame-timer) 0 0)

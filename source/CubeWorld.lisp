@@ -54,6 +54,9 @@
 				       (:SDL-GL-STENCIL-SIZE 4)
 				       (:SDL-GL-MULTISAMPLEBUFFERS 1)))
       (setf (sdl:frame-rate) +fps+)
+      (sdl:show-cursor nil)
+      (sdl:SDL-WM-GRAB-INPUT :sdl-grab-on)
+      
       (let ((texture (car (gl:gen-textures 1)))
 	    (image-data (load-texture (file-path "../texture/" "siki.png")
 				      128 128 3)))
@@ -108,9 +111,13 @@
 				 (set-key-state key t current-key)))
 	    (:key-up-event (:key key)
 			   (set-key-state key nil current-key))
-	    (:mouse-motion-event (:X x :Y y :X-REL x-rel :Y-REL y-rel)
-					;(format t "~a:~a:~a:~a~%" x y x-rel y-rel))
-				 (set-mouse mosue x y x-rel y-rel))
+	    (:mouse-motion-event (:X-REL x-rel :Y-REL y-rel)
+				 ;;(format t "~a:~a:~a:~a~%" x y x-rel y-rel))
+				 (set-mouse mouse
+					    (parse-integer
+					     (format nil "~a" x-rel))
+					    (parse-integer
+					     (format nil "~a" y-rel))))
 
 	    (:idle ()
 		   
@@ -122,58 +129,66 @@
 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;mode 3d render
+		   (gl:load-identity)
 		   (gl:matrix-mode :projection)
+		   (glu:look-at 20 5 0
+				0 0 0
+				0.0 1.0 0.0)
 		   (and (> frame-timer 0) (gl:pop-matrix))
 		   (gl:matrix-mode :modelview)
 		   (and (> frame-timer 0) (gl:pop-matrix))
-		   (gl:load-identity)
 
+		   
 		   (and (eql *debug* t) (axis 100))
 		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;camera
 		   ;;set camera pos in local
-		   (gl:color 1 0 0)
-		   (face-cube 0 0 0 3)
-		   (with-slots (plposx plposy plposz) player
+		   (with-slots (plposx plposy plposz pltheta) player
+		     (gl:color 1 1 1)
+		     (face-cube 0 0 0 3)
 		     
-					;  (gl:rotate (* 0.05 frame-timer) 0 1 0)
-		     (with-slots (right left up down sright sleft sup sdown) current-key
-					;      (and right (gl:translate 0 0 10))
-					;     (and left (gl:translate 0 0 -10))
-					;    (and up (gl:translate 10 0 0))
-					;   (and down (gl:translate -10 0 0)))
-		       (and right (set_player_pos player plposx plposy (+ plposz 1)))
-		       (and left (set_player_pos player plposx plposy (- plposz 1)))
-		       (and up (set_player_pos player (+ plposx 1) plposy plposz))
-		       (and down (set_player_pos player (- plposx 1) plposy plposz))
-		       (gl:translate plposx plposy plposz)
-		       )
-		     )
-		   (rotate-angle mouse)
-		   ;;set 
-					;	   (gl:translate (* 0.1 frame-timer) 0 0)
+		     (gl:rotate pltheta 0 1 0)
+		     (gl:translate plposx plposy plposz)
+		     
+		     (set_player_angle player (rotate-angle mouse))
+		     
+		     (with-slots (right left up down) current-key
+		       (and right (set_player_pos player
+						  (+ plposx (cos (mod (- 180 pltheta) 360)))
+						  plposy
+						  (+ plposz (sin (mod (- 180 pltheta) 360)))))
+		       (and left (set_player_pos player
+						 (+ plposx (cos (mod pltheta 360)))
+						 plposy
+						 (+ plposz (sin (mod pltheta 360)))))
+		       (and up (set_player_pos player
+					       (+ plposx (cos (- pltheta 90)))
+					       plposy
+					       (+ plposz (sin (- pltheta 90)))))
+		       (and down (set_player_pos player
+						 (+ plposx (cos (+ 90 pltheta)))
+						 plposy
+						 (+ plposz (sin (+ 90 pltheta)))))
+		       (gl:translate plposx plposy plposz)))
+		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
-		   ;;(gl:push-matrix)
+		   
 		   (gl:push-matrix)
-		   ;;(gl:load-identity)
-
 		   (gl:enable :blend)
 		   (gl:blend-func :src-alpha :one-minus-src-alpha)
-		   (gl:clear :color-buffer-bit)
 
 		   (gl:enable :texture-2d)
 		   (gl:bind-texture :texture-2d texture)
 		   (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
 		   (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
 		   (gl:tex-parameter :texture-2d :texture-border-color '(0 0 0 0))
-		   (gl:tex-image-2d :texture-2d 0 :rgba
+		   (gl:tex-image-2d :texture-2d 0 :rgb
 				    ;;(png-read:width image)
 				    ;;(png-read:height image)
 				    128 128
 				    0 :rgb :unsigned-byte image-data)
-		   (gl:color 1 1 1)
 		   (gl:scale (+ 1 (* 0.1 (sin (mod frame-timer 360))))
 			     1
 			     (+ 1 (* 0.1 (sin (mod frame-timer 360)))))

@@ -91,7 +91,7 @@
 	;;init Field of View
 	(glu:perspective 30 (/ +window-width+ +window-height+) 1 100)
 
-	(set-pos cam 20 40 0)
+	(set-pos cam 20 10 0)
 	(set-angle cam 0 0 0)
 
 	(with-slots (posx posy posz anglex angley anglez) cam
@@ -138,57 +138,65 @@
 		   
 		   (and (eql *debug* t) (axis 100))
 		   
-		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		   ;;player
-		   (gl:push-matrix)
-		   (gl:load-identity)
-		   (with-slots (plposx plposy plposz pltheta) player
-		     (gl:color 1 1 1)
-		     (gl:translate plposx plposy plposz)
-		     (face-cube 0 0 0 3)
-		      
-					;  (gl:rotate (* 0.05 frame-timer) 0 1 0)
-		     (with-slots (right left up down sright sleft sup sdown) current-key
-					;      (and right (gl:translate 0 0 10))
-					;     (and left (gl:translate 0 0 -10))
-					;    (and up (gl:translate 10 0 0))
-					;   (and down (gl:translate -10 0 0)))
-		       (and up (set_player_pos player 0 0 (+ plposz 1)))
-		       (and down (set_player_pos player 0 0 (- plposz 1)))
-		       (and left (set_player_pos player (+ plposx 1) 0 0))
-		       (and down (set_player_pos player (- plposx 1) 0 0))))
-		       
-		       
-		  
-		   (gl:pop-matrix)
-		     
 		   ;;camera
 		   ;;set camera pos in local
-		   #|
 		   (with-slots (posx posy posz anglex angley anglez) cam
-		     ;;set camera position and direction of looking to
-		     (set-pos cam posx 0 posz)
-		     (set-angle cam 0 0 0)
-		     (glu:look-at posx posy posz
-				  anglex angley anglez
-				  0.0 1.0 0.0))
-		  ; (gl:matrix-mode :modelview)
-		     |#  
+		     (with-slots (plposx plposy plposz pltheta) player
+		       ;;set camera position and direction of looking to
+		       (set-pos cam
+				(+ plposx (sin (+ pi pltheta)))
+				0
+				(+ plposz (cos (+ pi pltheta))))
+		       (glu:look-at posx posy posz
+				    plposx plposy plposz
+				    0.0 1.0 0.0)))
+
+
+		   ;;player
+		   (gl:push-matrix)
+		   (with-slots (plposx plposy plposz pltheta) player
+		     (gl:color 0 1 0)
+		     (gl:translate plposx plposy plposz)
+		     (face-cube 0 1 0 0.5)
+		     (set_player_angle player (rotate-angle mouse))
+		     (with-slots (right left up down) current-key
+		       (format t "x:~a y:~a theta:~a~%" plposx plposz pltheta)
+		       (and down
+			    (set_player_pos player
+					    (- plposx (cos pltheta))
+					    0
+					    (- plposz (sin pltheta))))
+		       (and up
+			    (set_player_pos player
+					    (- plposx (cos (+ pi pltheta)))
+					    0
+					    (- plposz (sin (+ pi pltheta)))))
+		       (and right
+			    (set_player_pos player
+					    (- plposx (cos (+ (/ (* 3 pi) 2) pltheta)))
+					    0
+					    (- plposz (sin (+ (/ (* 3 pi) 2)pltheta)))))
+		       (and left
+			    (set_player_pos player
+					    (- plposx (cos (+ (/ pi 2) pltheta)))
+					    0
+					    (- plposz (sin (+ (/ pi 2) pltheta)))))))
+		   (gl:pop-matrix)
 		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
-		   (gl:load-identity)
 		   (gl:push-matrix)
-		 ;  (gl:load-identity)
+		   
 		   (gl:enable :blend)
 		   (gl:blend-func :src-alpha :one-minus-src-alpha)
-
+		   
 		   (gl:enable :texture-2d)
 		   (gl:bind-texture :texture-2d texture)
 		   (gl:tex-parameter :texture-2d :texture-min-filter :nearest)
 		   (gl:tex-parameter :texture-2d :texture-mag-filter :nearest)
-		   (gl:tex-parameter :texture-2d :texture-border-color '(0 0 0 0))
+		   (gl:tex-parameter :texture-2d :texture-border-color
+				     '(0 0 0 0))
 		   (gl:tex-image-2d :texture-2d 0 :rgb
 				    ;;(png-read:width image)
 				    ;;(png-read:height image)
@@ -197,6 +205,7 @@
 		   (gl:scale (+ 1 (* 0.1 (sin (mod frame-timer 360))))
 			     1
 			     (+ 1 (* 0.1 (sin (mod frame-timer 360)))))
+		   
 		   (gl:with-primitives :quads
 		     (gl:tex-coord 0 0)
 		     (gl:vertex 0 3 0)
@@ -211,7 +220,6 @@
 		   
 		   ;;stage
 		   (gl:push-matrix)
-		   (gl:load-identity)
 		   (dotimes (l 4)
 		     (gl:rotate 90 0 1 0)
 		     (dotimes (n 15)

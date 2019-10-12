@@ -15,7 +15,8 @@
     (list mouse-x-rel mouse-y-rel)))
 
 (defmethod rotate-angle((mouse mouse))
-  (let ((theta (* 0.05 (nth 0 (get-mouse mouse)))))
+  (let ((theta (* (/ (nth 0 (get-mouse mouse)) 180) pi)))
+    
     (gl:rotate theta 0 1 0)
     theta))
 

@@ -25,8 +25,8 @@
     :initarg :anglez
     :initform 0)))
 
-(defmethod set-pos ((obj camera) x y z)
-  (with-slots (posx posy posz) obj
+(defmethod set-pos ((camera camera) x y z)
+  (with-slots (posx posy posz) camera
     (setf posx x)
     (setf posy y)
     (setf posz z)
@@ -37,8 +37,8 @@
 	   (format t "~a " posy)
 	   (format t "~a~%" posz)))))
 
-(defmethod set-angle ((obj camera) x y z)
-  (with-slots (anglex angley anglez) obj
+(defmethod set-angle ((camera camera) x y z)
+  (with-slots (anglex angley anglez) camera
     (setf anglex x)
     (setf angley y)
     (setf anglez z)

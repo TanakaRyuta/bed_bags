@@ -91,7 +91,7 @@
 	;;init Field of View
 	(glu:perspective 30 (/ +window-width+ +window-height+) 1 100)
 
-	(set-pos cam 20 20 0)
+	(set-pos cam 20 40 0)
 	(set-angle cam 0 0 0)
 
 	(with-slots (posx posy posz anglex angley anglez) cam
@@ -138,21 +138,49 @@
 		   
 		   (and (eql *debug* t) (axis 100))
 		   
+		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-		   ;;camera
-		   ;;set camera pos in local
+		   ;;player
+		   (gl:push-matrix)
+		   (gl:load-identity)
 		   (with-slots (plposx plposy plposz pltheta) player
 		     (gl:color 1 1 1)
+		     (gl:translate plposx plposy plposz)
 		     (face-cube 0 0 0 3)
+		      
+					;  (gl:rotate (* 0.05 frame-timer) 0 1 0)
+		     (with-slots (right left up down sright sleft sup sdown) current-key
+					;      (and right (gl:translate 0 0 10))
+					;     (and left (gl:translate 0 0 -10))
+					;    (and up (gl:translate 10 0 0))
+					;   (and down (gl:translate -10 0 0)))
+		       (and up (set_player_pos player 0 0 (+ plposz 1)))
+		       (and down (set_player_pos player 0 0 (- plposz 1)))
+		       (and left (set_player_pos player (+ plposx 1) 0 0))
+		       (and down (set_player_pos player (- plposx 1) 0 0))))
+		       
+		       
+		  
+		   (gl:pop-matrix)
 		     
-		     (gl:rotate pltheta 0 1 0)
-		     (gl:translate plposx plposy plposz))
-		   
+		   ;;camera
+		   ;;set camera pos in local
+		   #|
+		   (with-slots (posx posy posz anglex angley anglez) cam
+		     ;;set camera position and direction of looking to
+		     (set-pos cam posx 0 posz)
+		     (set-angle cam 0 0 0)
+		     (glu:look-at posx posy posz
+				  anglex angley anglez
+				  0.0 1.0 0.0))
+		  ; (gl:matrix-mode :modelview)
+		     |#  
 		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
-		   
+		   (gl:load-identity)
 		   (gl:push-matrix)
+		 ;  (gl:load-identity)
 		   (gl:enable :blend)
 		   (gl:blend-func :src-alpha :one-minus-src-alpha)
 
@@ -183,6 +211,7 @@
 		   
 		   ;;stage
 		   (gl:push-matrix)
+		   (gl:load-identity)
 		   (dotimes (l 4)
 		     (gl:rotate 90 0 1 0)
 		     (dotimes (n 15)

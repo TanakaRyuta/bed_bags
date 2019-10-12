@@ -129,15 +129,12 @@
 
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;mode 3d render
-		   (gl:load-identity)
+		   
 		   (gl:matrix-mode :projection)
-		   (glu:look-at 20 5 0
-				0 0 0
-				0.0 1.0 0.0)
 		   (and (> frame-timer 0) (gl:pop-matrix))
 		   (gl:matrix-mode :modelview)
 		   (and (> frame-timer 0) (gl:pop-matrix))
-
+		   (gl:load-identity)
 		   
 		   (and (eql *debug* t) (axis 100))
 		   
@@ -149,28 +146,8 @@
 		     (face-cube 0 0 0 3)
 		     
 		     (gl:rotate pltheta 0 1 0)
-		     (gl:translate plposx plposy plposz)
-		     
-		     (set_player_angle player (rotate-angle mouse))
-		     
-		     (with-slots (right left up down) current-key
-		       (and right (set_player_pos player
-						  (+ plposx (cos (mod (- 180 pltheta) 360)))
-						  plposy
-						  (+ plposz (sin (mod (- 180 pltheta) 360)))))
-		       (and left (set_player_pos player
-						 (+ plposx (cos (mod pltheta 360)))
-						 plposy
-						 (+ plposz (sin (mod pltheta 360)))))
-		       (and up (set_player_pos player
-					       (+ plposx (cos (- pltheta 90)))
-					       plposy
-					       (+ plposz (sin (- pltheta 90)))))
-		       (and down (set_player_pos player
-						 (+ plposx (cos (+ 90 pltheta)))
-						 plposy
-						 (+ plposz (sin (+ 90 pltheta)))))
-		       (gl:translate plposx plposy plposz)))
+		     (gl:translate plposx plposy plposz))
+		   
 		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects

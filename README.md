@@ -15,6 +15,7 @@
 - その他（Path,）：others.lisp
 - テキストボックス：textbox.lisp
 - font描画：ttf.lisp
+- 重力、衝突判定:collition.lisp
 
 ### ./ttf
 フォントの格納場所

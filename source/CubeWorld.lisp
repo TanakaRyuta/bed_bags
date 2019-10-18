@@ -18,7 +18,7 @@
 ;;(load "status.lisp" :external-format :utf-8)
 (load "objects.lisp" :external-format :utf-8)
 (load "others.lisp" :external-format :utf-8)
-(load "ttf.lisp" :external-format :utf-8)
+;;(load "ttf.lisp" :external-format :utf-8)
 (load "player.lisp" :external-format :utf-8)
 (load "mouse.lisp" :external-format :utf-8)
 

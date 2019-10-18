@@ -63,12 +63,23 @@
 
 (defmethod get-table (binary (ttf-table ttf-table))
   (dotimes (i (num-tables ttf-table))
-    (let ar (subseq binary (+ 12 (* 16 i)) 16)
-	 (append 
-	  (ttf-record-tag (subseq ar 0 4) ttf-table)
-	  ;;(ttf-record-checksum (subseq ar 4 8) ttf-table)
-	  (ttf-record-offset (subseq ar 8 12) ttf-table)
-	  (ttf-record-length (subseq ar 12 16) ttf-table)))))
+    (let ((ar (subseq binary (+ 12 (* 16 i)) 16)))
+      (append 
+       (ttf-record-tag (subseq ar 0 4) ttf-table)
+       ;;(ttf-record-checksum (subseq ar 4 8) ttf-table)
+       (ttf-record-offset (subseq ar 8 12) ttf-table)
+       (ttf-record-length (subseq ar 12 16) ttf-table)))))
+(defun get-table-header (num-tables)
+  (let ((search-range)
+	(entry-selector)
+	(range-shift))
+    (setf entry-selector
+	  (floor (log num-tables 2)))
+    (setf search-range
+	  (* 16 (ash 1 entry-selector)))
+    (setf range-shift
+	  (- (* 16 num-tables) search-range))
+    (list search-range entry-selector range-shift)))
 
 (defmethod ttf-record-tag (binary (ttf-table ttf-table))
   (cond ((and (eql #x46 (aref binary 0))

@@ -16,11 +16,13 @@
   (with-slots (mouse-x-rel mouse-y-rel) mouse
     (list mouse-x-rel mouse-y-rel)))
 
-(defmethod rotate-angle(sensitive (mouse mouse))
-  (let ((theta (Deg (* 180 pi (/ (nth 0 (get-mouse mouse)) 3000) sensitive))))
-    (format t "mouse::~a~%rad::~a~%"
-	    (get-mouse mouse)
-	    (* 180 pi (/ (nth 0 (get-mouse mouse)) 3000)))
-    theta))
+(defun move-deg (move)
+  (Deg (* 180 pi (/ move 3000))))
+
+(defmethod rotate-angle(sensitive (mouse mouse) &key (inverse nil))
+  (let ((theta (* (move-deg (nth 0 (get-mouse mouse))) sensitive)))
+    (if inverse
+	(* -1 theta)
+	theta)))
 
 

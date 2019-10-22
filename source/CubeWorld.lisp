@@ -46,8 +46,8 @@
       (sdl:window +window-width+ +window-height+
 		  :title-caption "タイトル"
 		  :icon-caption "title"
-		  ;;:fullscreen
-		  ;;:no-frame
+		  ;;:fullscreen t
+		  :no-frame t
 		  :opengl t
 		  :opengl-attributes '((:sdl-gl-doublebuffer 1)
 				       (:SDL-GL-DEPTH-SIZE 16)
@@ -144,7 +144,6 @@
 		   (with-slots (posx posy posz anglex angley anglez) cam
 		     (with-slots (plposx plposy plposz pltheta) player
 		       ;;set camera position and direction of looking to
-		       (format t "cos::~a sin::~a~%" (cos pltheta) (sin pltheta))
 		       (set-pos cam
 				(+ plposx (sin (rad pltheta)))
 				0
@@ -156,37 +155,16 @@
 
 		   ;;player
 		   (gl:push-matrix)
-		   (with-slots (plposx plposy plposz pltheta) player
+		   (with-slots (plposx plposy plposz) player
 		     (gl:color 1 1 1)
 		     
 		     (gl:translate plposx plposy plposz)
-		     (gl:rotate  (* -1 (set-player-angle player (rotate-angle 0.001 mouse))) 0 1 0)
+		     (gl:rotate  (* -1 (set-player-angle player (rotate-angle 0.01 mouse :inverse t))) 0 1 0)
 		     
 		     (face-cube 0 1 0 0.5)
 		     
-		     
-		     (with-slots (right left up down) current-key
-		       (format t "x:~a z:~a theta:~a~%" plposx plposz pltheta)
-		       (and up
-			    (set-player-pos player
-					    (- plposx (cos (rad pltheta)))
-					    0
-					    (+ plposz (sin (rad pltheta)))))
-		       (and down
-			    (set-player-pos player
-					    (- plposx (cos (rad (+ 180 pltheta))))
-					    0
-					    (+ plposz (sin (rad (+ 180 pltheta))))))
-		       (and right
-			    (set-player-pos player
-					    (- plposx (cos (rad (+ 270 pltheta))))
-					    0
-					    (+ plposz (sin (rad (+ 270 pltheta))))))
-		       (and left
-			    (set-player-pos player
-					    (- plposx (cos (rad (+ 90 pltheta))))
-					    0
-					    (+ plposz (sin (rad (+ 90 pltheta))))))))
+		     (move-player player current-key))
+		   
 		   (gl:pop-matrix)
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects

@@ -1,5 +1,6 @@
 ;;load file
 (load "loader.lisp" :external-format :utf-8)
+(load "key.lisp" :external-format :utf-8)
 
 ;;
 (defclass player ()
@@ -28,3 +29,27 @@
   (with-slots (pltheta) player
     (setf pltheta theta))
   (* -1 theta))
+
+(defmethod move-player ((player player) (key-state key-state))
+  (with-slots (plposx plposy plposz pltheta) player
+    (with-slots (right left up down) key-state
+      (and up
+	   (set-player-pos player
+			   (- plposx (cos (rad pltheta)))
+			   0
+			   (+ plposz (sin (rad pltheta)))))
+      (and down
+	   (set-player-pos player
+			   (- plposx (cos (rad (+ 180 pltheta))))
+			   0
+			   (+ plposz (sin (rad (+ 180 pltheta))))))
+      (and right
+	   (set-player-pos player
+			   (- plposx (cos (rad (+ 270 pltheta))))
+			   0
+			   (+ plposz (sin (rad (+ 270 pltheta))))))
+      (and left
+	   (set-player-pos player
+			   (- plposx (cos (rad (+ 90 pltheta))))
+			   0
+			   (+ plposz (sin (rad (+ 90 pltheta)))))))))

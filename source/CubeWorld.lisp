@@ -82,7 +82,7 @@
 	 ;;:light0
 	 )
 	
-	;;init...? 
+	;;init matrix
 	(gl:load-identity)
 
 	;;set game screen in window
@@ -144,10 +144,11 @@
 		   (with-slots (posx posy posz anglex angley anglez) cam
 		     (with-slots (plposx plposy plposz pltheta) player
 		       ;;set camera position and direction of looking to
+		       (format t "cos::~a sin::~a~%" (cos pltheta) (sin pltheta))
 		       (set-pos cam
-				(+ plposx (sin (+ pi pltheta)))
+				(+ plposx (sin (rad pltheta)))
 				0
-				(+ plposz (cos (+ pi pltheta))))
+				(+ plposz (cos (rad pltheta))))
 		       (glu:look-at posx posy posz
 				    plposx plposy plposz
 				    0.0 1.0 0.0)))
@@ -156,34 +157,37 @@
 		   ;;player
 		   (gl:push-matrix)
 		   (with-slots (plposx plposy plposz pltheta) player
-		     (gl:color 0 1 0)
+		     (gl:color 1 1 1)
+		     
 		     (gl:translate plposx plposy plposz)
+		     (gl:rotate  (* -1 (set-player-angle player (rotate-angle 0.001 mouse))) 0 1 0)
+		     
 		     (face-cube 0 1 0 0.5)
-		     (set_player_angle player (rotate-angle mouse))
+		     
+		     
 		     (with-slots (right left up down) current-key
-		       (format t "x:~a y:~a theta:~a~%" plposx plposz pltheta)
-		       (and down
-			    (set_player_pos player
-					    (- plposx (cos pltheta))
-					    0
-					    (- plposz (sin pltheta))))
+		       (format t "x:~a z:~a theta:~a~%" plposx plposz pltheta)
 		       (and up
-			    (set_player_pos player
-					    (- plposx (cos (+ pi pltheta)))
+			    (set-player-pos player
+					    (- plposx (cos (rad pltheta)))
 					    0
-					    (- plposz (sin (+ pi pltheta)))))
+					    (+ plposz (sin (rad pltheta)))))
+		       (and down
+			    (set-player-pos player
+					    (- plposx (cos (rad (+ 180 pltheta))))
+					    0
+					    (+ plposz (sin (rad (+ 180 pltheta))))))
 		       (and right
-			    (set_player_pos player
-					    (- plposx (cos (+ (/ (* 3 pi) 2) pltheta)))
+			    (set-player-pos player
+					    (- plposx (cos (rad (+ 270 pltheta))))
 					    0
-					    (- plposz (sin (+ (/ (* 3 pi) 2)pltheta)))))
+					    (+ plposz (sin (rad (+ 270 pltheta))))))
 		       (and left
-			    (set_player_pos player
-					    (- plposx (cos (+ (/ pi 2) pltheta)))
+			    (set-player-pos player
+					    (- plposx (cos (rad (+ 90 pltheta))))
 					    0
-					    (- plposz (sin (+ (/ pi 2) pltheta)))))))
+					    (+ plposz (sin (rad (+ 90 pltheta))))))))
 		   (gl:pop-matrix)
-		   
 	       ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   ;;3D objects
 		   (gl:push-matrix)

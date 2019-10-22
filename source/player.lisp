@@ -14,7 +14,7 @@
   (with-slots (plposx plposy plposz) player
     (list plposx plposy plposz)))
 
-(defmethod set_player_pos ((player player) x y z)
+(defmethod set-player-pos ((player player) x y z)
   (with-slots (plposx plposy plposz) player
     (setf plposx x)
     (setf plposy y)
@@ -24,6 +24,7 @@
   (with-slots (pltheta) player
     pltheta))
 
-(defmethod set_player_angle ((player player) theta)
+(defmethod set-player-angle ((player player) theta)
   (with-slots (pltheta) player
-    (setf pltheta theta)))
+    (setf pltheta theta))
+  (* -1 theta))

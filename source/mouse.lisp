@@ -1,3 +1,5 @@
+(load "others.lisp" :external-format :utf-8)
+
 (defclass mouse ()
   ;;define use key
   ((mouse-x :initform 0)
@@ -14,10 +16,11 @@
   (with-slots (mouse-x-rel mouse-y-rel) mouse
     (list mouse-x-rel mouse-y-rel)))
 
-(defmethod rotate-angle((mouse mouse))
-  (let ((theta (* (/ (nth 0 (get-mouse mouse)) 180) pi)))
-    
-    (gl:rotate theta 0 1 0)
+(defmethod rotate-angle(sensitive (mouse mouse))
+  (let ((theta (Deg (* 180 pi (/ (nth 0 (get-mouse mouse)) 3000) sensitive))))
+    (format t "mouse::~a~%rad::~a~%"
+	    (get-mouse mouse)
+	    (* 180 pi (/ (nth 0 (get-mouse mouse)) 3000)))
     theta))
 
 

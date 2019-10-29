@@ -17,10 +17,12 @@
    (sup
     :initform nil)
    (sdown
+    :initform nil)
+   (text-box
     :initform nil)))
 
 (defmethod set-key-state (key key-press (key-state key-state))
-  (with-slots (right left up down sright sleft sup sdown) key-state
+  (with-slots (right left up down sright sleft sup sdown text-box) key-state
     (cond ((sdl:key= key :sdl-key-right) (setf right key-press))
 	  ((sdl:key= key :sdl-key-left)  (setf left key-press))
 	  ((sdl:key= key :sdl-key-up)    (setf up key-press))
@@ -29,7 +31,8 @@
 	  ((sdl:key= key :sdl-key-D)     (setf sright key-press))
 	  ((sdl:key= key :sdl-key-W)     (setf sup key-press))
 	  ((sdl:key= key :sdl-key-S)     (setf sdown key-press))
-	  #|((sdl:key= key :sdl-key-)    (setf key key-press))|#)))
+	  ((sdl:key= key :sdl-key-T)     (setf text-box key-press)))))
+#|((sdl:key= key :sdl-key-)    (setf key key-press))|#
 
 (defun test-input-key (current-key)
   (with-slots (right left up down sright sleft sup sdown) current-key

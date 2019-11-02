@@ -4,6 +4,7 @@
 		:cl-glu
 		:zpng
 		:png-read
+		:classimp
 		;;:cl-glut
 		))
 

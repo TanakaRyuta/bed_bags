@@ -68,41 +68,41 @@
   (gl:translate x y z)
   (gl:scale r r r)
   (gl:with-primitives :lines
-    (gl:vertex 0 0 0)
-    (gl:vertex 1 0 0))
+    (gl:vertex -0.5 -0.5 -0.5)
+    (gl:vertex 0.5 -0.5 -0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 0 0)
-    (gl:vertex 0 1 0))
+    (gl:vertex -0.5 -0.5  -0.5)
+    (gl:vertex -0.5 0.5 -0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 0 0)
-    (gl:vertex 0 0 1))
+    (gl:vertex -0.5 -0.5 -0.5)
+    (gl:vertex -0.5 -0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 1 0 0)
-    (gl:vertex 1 1 0))
+    (gl:vertex 0.5 -0.5 -0.5)
+    (gl:vertex 0.5 0.5 -0.5))
   (gl:with-primitives :lines
-    (gl:vertex 1 0 0)
-    (gl:vertex 1 0 1))
+    (gl:vertex 0.5 -0.5 -0.5)
+    (gl:vertex 0.5 -0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 1 0)
-    (gl:vertex 1 1 0))
+    (gl:vertex -0.5 0.5 -0.5)
+    (gl:vertex 0.5 0.5 -0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 1 0)
-    (gl:vertex 0 1 1))
+    (gl:vertex -0.5 0.5 -0.5)
+    (gl:vertex -0.5 0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 0 1)
-    (gl:vertex 1 0 1))
+    (gl:vertex -0.5 -0.5 0.5)
+    (gl:vertex 0.5 -0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 0 1)
-    (gl:vertex 0 1 1))
+    (gl:vertex -0.5 -0.5 0.5)
+    (gl:vertex -0.5 0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 1 1 0)
-    (gl:vertex 1 1 1))
+    (gl:vertex 0.5 0.5 -0.5)
+    (gl:vertex 0.5 0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 1 0 1)
-    (gl:vertex 1 1 1))
+    (gl:vertex 0.5 -0.5 0.5)
+    (gl:vertex 0.5 0.5 0.5))
   (gl:with-primitives :lines
-    (gl:vertex 0 1 1)
-    (gl:vertex 1 1 1))
+    (gl:vertex -0.5 0.5 0.5)
+    (gl:vertex 0.5 0.5 0.5))
   (gl:pop-matrix))
 
 (defun face-frame-cube (x y z r cr cg cb)

@@ -28,7 +28,7 @@
 (defmethod set-player-angle ((player player) theta)
   (with-slots (pltheta) player
     (setf pltheta theta))
-  (* -1 theta))
+  theta)
 
 (defmethod move-player ((player player) (key-state key-state))
   (with-slots (plposx plposy plposz pltheta) player

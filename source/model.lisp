@@ -399,25 +399,6 @@
   (float (* 50 (/ (get-internal-real-time)
                   (float internal-time-units-per-second)))))
 
-(defun reload-scene (&optional window)
-  (when *filename*
-    (format t "reload scene -> ~s~%" *filename*)
-    (let ((s (ai:import-into-lisp
-              (cffi-sys:native-namestring (truename *filename*))
-              :processing-flags '(:ai-process-validate-data-structure
-                                  :ai-process-preset-target-realtime-quality))))
-      (when (and window s)
-        (unload-textures window)
-        (setf (scene window) s)
-        (format t "  set bounds~%")
-        (update-bounds window)
-        (format t "  load materials~%")
-        (reload-textures window nil))
-      (if s
-          (format t "loaded ~s~%" *filename*)
-          (format t "failed to load ~s~%" *filename*))
-      s)))
-
 (defun unload-textures (window)
   (when (and window (scene window))
     (format t "  cleaning up materials~%")
@@ -502,6 +483,25 @@
                         final-path)
                 (setf (getf (cdddr tf) :texture-name)
                       (ilut:gl-load-image final-path))))))
+
+(defun reload-scene (&optional window)
+  (when *filename*
+    (format t "reload scene -> ~s~%" *filename*)
+    (let ((s (ai:import-into-lisp
+              (cffi-sys:native-namestring (truename *filename*))
+              :processing-flags '(:ai-process-validate-data-structure
+                                  :ai-process-preset-target-realtime-quality))))
+      (when (and window s)
+        (unload-textures window)
+        (setf (scene window) s)
+        (format t "  set bounds~%")
+        (update-bounds window)
+        (format t "  load materials~%")
+        (reload-textures window nil))
+      (if s
+          (format t "loaded ~s~%" *filename*)
+          (format t "failed to load ~s~%" *filename*))
+      s)))
 
 (defmethod xform ((model ai-sample3-model))
   (unless (and *use-lights* (ai:lights (scene model)))

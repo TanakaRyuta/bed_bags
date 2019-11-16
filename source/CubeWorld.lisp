@@ -7,7 +7,7 @@
 		))
 
 (defvar *debug* nil)
-(setf *debug* nil)
+(setf *debug* t)
 
 ;;load file
 (load "key.lisp" :external-format :utf-8)
@@ -95,7 +95,7 @@
 		     ;;init Field of View
 		     (glu:perspective 30 (/ +window-width+ +window-height+) 1 100)
 
-		     (set-pos cam 20 10 0)
+		     (set-pos cam 30 10 0)
 		     (set-angle cam 0 0 0)
 
 		     (with-slots (posx posy posz anglex angley anglez) cam
@@ -163,7 +163,8 @@
 				  (gl:color 1 1 1)
 				  
 				  (gl:translate plposx plposy plposz)
-				  (gl:rotate  (* -1 (set-player-angle player (rotate-angle 0.01 mouse :inverse t))) 0 1 0)
+				  (gl:rotate (set-player-angle player (rotate-angle 0.01 mouse :inverse t))
+					     0 1 0)
 				  
 				  (frame-cube 0 2.5 0 2.5)
 				  (gl:push-matrix)
